@@ -1,0 +1,95 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+    id        Int      @id @default(autoincrement())
+    email     String @unique
+    password  String
+    status    Status
+    role      Role
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+}
+
+model Teacher {
+    id        Int      @id @default(autoincrement())
+    firstName String
+    lastName  String
+    email     String @unique
+    status    Status
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    courses    Course[]
+}
+
+model Student {
+    id        Int      @id @default(autoincrement())
+    firstName String
+    lastName  String
+    email     String @unique
+    status    Status 
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    courses Inscription[]
+}
+
+model Course {
+    id        Int      @id @default(autoincrement())
+    title     String
+    description String
+    beginDate DateTime @db.Date
+    endDate   DateTime @db.Date
+    status    CourseStatus
+    students  Inscription[]
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    teacher   Teacher   @relation(fields: [teacherId], references: [id])
+    teacherId Int
+}
+
+model Inscription {
+    id        Int      @id @default(autoincrement())
+    courseId  Int     
+    studentId Int    
+    status    InscriptionStatus @default(PENDING)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+    course    Course    @relation(fields: [courseId], references: [id])
+    student   Student   @relation(fields: [studentId], references: [id])
+
+    @@unique([courseId, studentId])
+}
+
+enum Role {
+    ADMIN
+    COORDINATOR
+}
+
+enum Status {
+    ACTIVE
+    INACTIVE
+}
+
+enum CourseStatus {
+    SCHEDULED
+    STARTED
+    FINISHED
+}
+
+enum InscriptionStatus {
+    PENDING
+    ACCEPTED
+    REJECTED
+}
