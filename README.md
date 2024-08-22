@@ -27,13 +27,26 @@ git clone https://github.com/emiperez997/platform-learning.git
 pnpm install
 ```
 
-3. Iniciar el servidor de base de datos con `docker-compose up -d`
+3. Crear el archivo `.env` con el siguiente contenido
+
+```bash
+DATABASE_URL=
+JWT_SECRET=
+```
+
+4. Iniciar el servidor de base de datos con `docker-compose up -d` (En caso de no usar una base de datos en la nube)
 
 ```bash
 docker-compose up -d
 ```
 
-4. Iniciar el servidor de backend con `pnpm run start`
+5. Ejecutar `prisma migrate dev` para crear la base de datos
+
+```bash
+prisma migrate dev
+```
+
+6. Iniciar el servidor de backend con `pnpm run start`
 
 ```bash
 pnpm run start
