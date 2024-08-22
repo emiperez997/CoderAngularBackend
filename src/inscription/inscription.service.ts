@@ -5,6 +5,7 @@ import { CreateInscriptionDto } from "./dto/CreateInscriptionDto";
 import { UpdateInscriptionDto } from "./dto/UpdateInscription";
 import { ErrorCodes } from "src/utils/ErrorCodes";
 import { log } from "console";
+import { Status } from "@prisma/client";
 
 @Injectable()
 export class InscriptionService {
@@ -41,6 +42,20 @@ export class InscriptionService {
   }
 
   async create(inscription: CreateInscriptionDto): Promise<Inscription> {
+    const student = await this.prisma.student.findUnique({
+      where: {
+        id: inscription.studentId,
+      },
+    });
+
+    if (!student) {
+      throw new HttpException("Student not found", 404);
+    }
+
+    if (student.status !== Status.ACTIVE) {
+      throw new HttpException("Student is not active", 400);
+    }
+
     try {
       const inscriptionDB = await this.prisma.inscription.create({
         data: {

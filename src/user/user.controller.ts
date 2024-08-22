@@ -3,10 +3,13 @@ import {
   Controller,
   Delete,
   Get,
+  HttpException,
+  HttpStatus,
   Param,
   ParseIntPipe,
   Post,
   Put,
+  Req,
   UseGuards,
   ValidationPipe,
 } from "@nestjs/common";
@@ -17,6 +20,7 @@ import { CreateUserDto } from "./dto/CreateUserDto";
 import { UserService } from "./user.service";
 import { UpdateUserDto } from "./dto/UpdateUserDto";
 import { AdminGuard } from "src/auth/guards/AdminGuard";
+import { CustomRequest } from "./interfaces/Request";
 
 @Controller("/users")
 @UseGuards(AdminGuard)
@@ -47,7 +51,17 @@ export class UserController {
   }
 
   @Delete("/:id")
-  async delete(@Param("id", ParseIntPipe) id: number): Promise<User> {
+  async delete(
+    @Param("id", ParseIntPipe) id: number,
+    @Req() req: CustomRequest,
+  ): Promise<User> {
+    if (req.user.sub === id) {
+      throw new HttpException(
+        "You can't delete yourself",
+        HttpStatus.FORBIDDEN,
+      );
+    }
+
     return this.adminService.delete(id);
   }
 }

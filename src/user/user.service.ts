@@ -96,6 +96,8 @@ export class UserService {
         },
         data: {
           email: user.email,
+          role: user.role,
+          status: user.status,
         },
       });
 
